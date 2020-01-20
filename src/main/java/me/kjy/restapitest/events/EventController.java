@@ -1,5 +1,6 @@
 package me.kjy.restapitest.events;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.ResponseEntity;
@@ -22,18 +23,25 @@ public class EventController {
 
     // 생성자로 주입을 받을 수 있음
     private final EventRepository eventRepository;
+
+    private final ModelMapper modelMapper;
     //@Autowired
-    public EventController(EventRepository eventRepository){
+    public EventController(EventRepository eventRepository, ModelMapper modelMapper){
         this.eventRepository=eventRepository;
+        this.modelMapper=modelMapper;
     }
 
     @PostMapping
-    public ResponseEntity createEvent(@RequestBody Event event) {
-        // created()로 보낼 땐 항상 uri 가 있어야함
-        // ==> HATEOS가 제공하는 linkTo(), methodOn() 사용
-       Event newEvent = this.eventRepository.save(event);
+    public ResponseEntity createEvent(@RequestBody EventDto eventDto) {
+//        Event event = Event.builder()
+//                .name(eventDto.getName())
+//                .description(eventDto.getDescription())
+//                .build();
+
+        // 위의 과정과 같은 역할 ==> ModelMaper
+        Event event = modelMapper.map(eventDto, Event.class);
+        Event newEvent = this.eventRepository.save(event);
         URI createdUri = linkTo(EventController.class).slash(newEvent.getId()).toUri();
-        event.setId(10);
         return ResponseEntity.created(createdUri).body(event);
     }
 }
