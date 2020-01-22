@@ -1,6 +1,7 @@
 package me.kjy.restapitest.events;
 
 import org.modelmapper.ModelMapper;
+import org.modelmapper.internal.Errors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.validation.Valid;
 import java.net.URI;
 
 import static org.springframework.hateoas.server.mvc.ControllerLinkBuilder.linkTo;
@@ -31,14 +33,18 @@ public class EventController {
         this.modelMapper=modelMapper;
     }
 
+    // @Valid ==> Dto의 각 필드 조건을 검사한 후, @Valid바로 오른쪽에 있는 Error객체에 에러를 담아줌
     @PostMapping
-    public ResponseEntity createEvent(@RequestBody EventDto eventDto) {
+    public ResponseEntity createEvent(@RequestBody @Valid EventDto eventDto, Errors errors) {
 //        Event event = Event.builder()
 //                .name(eventDto.getName())
 //                .description(eventDto.getDescription())
 //                .build();
 
         // 위의 과정과 같은 역할 ==> ModelMaper
+        if(errors.hasErrors()) {
+            return ResponseEntity.badRequest().build();
+        }
         Event event = modelMapper.map(eventDto, Event.class);
         Event newEvent = this.eventRepository.save(event);
         URI createdUri = linkTo(EventController.class).slash(newEvent.getId()).toUri();
