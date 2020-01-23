@@ -83,7 +83,10 @@ public class EventControllerTests {
                 .andExpect(jsonPath("free").value(false))
                 .andExpect(jsonPath("offline").value(true))
                 .andExpect(jsonPath("eventStatus").value(EventStatus.DRAFT.name()))
-
+                // 응답에 HATEOAS와 profile 관련 링크가 있는지 확인.
+//                .andExpect(jsonPath("_links.self").exists()) // view
+                .andExpect(jsonPath("_links.query-events").exists()) // 만든 사람은 수정할 수 있으니까
+                .andExpect(jsonPath("_links.update-event").exists()) // 목록으로 가는 링크
         ;
     }
 
