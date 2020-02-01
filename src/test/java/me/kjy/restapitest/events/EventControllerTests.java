@@ -1,21 +1,13 @@
 package me.kjy.restapitest.events;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import me.kjy.restapitest.common.BaseControllerTest;
 import me.kjy.restapitest.common.RestDocsConfiguration;
 import me.kjy.restapitest.common.TestDescription;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDateTime;
 import java.util.stream.IntStream;
 import static org.springframework.restdocs.headers.HeaderDocumentation.*;
@@ -27,12 +19,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@AutoConfigureMockMvc
-@AutoConfigureRestDocs
-@Import(RestDocsConfiguration.class)
-public class EventControllerTests {
+
+public class EventControllerTests extends BaseControllerTest {
     // Test 단축키 : Ctrl + Shift + F10
     /*
     *** MockMvc
@@ -42,18 +30,12 @@ public class EventControllerTests {
     * web server를 띄우지 않기 때문에 좀 더 빠름
     * dispatcher servlet을 띄워야 하기에 단위테스트 보다는 조금 느림
     */
-    @Autowired
-    MockMvc mockMvc;
 
-    // 자동으로 objectMapper가 bean으로 등록되어 있음.
-    @Autowired
-    ObjectMapper objectMapper;
 
     @Autowired
     EventRepository eventRepository;
 
-    @Autowired
-    ModelMapper modelMapper;
+
 
     // Mock 객체이므로 save를 하더라도 리턴되는 값이 모두 null임 --> mocking을 안하고 더이상 slicing test가 아니어야 하므로 mockbean을 없애야함
 //    @MockBean
@@ -210,11 +192,11 @@ public class EventControllerTests {
                 .content(this.objectMapper.writeValueAsString(eventDto)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$[0].objectName").exists())
+                .andExpect(jsonPath("content[0].objectName").exists())
 //                .andExpect(jsonPath("$[0].field").exists())
-                .andExpect(jsonPath("$[0].defaultMessage").exists())
-                .andExpect(jsonPath("$[0].code").exists())
-//                .andExpect(jsonPath("$[0].rejectedValue").exists())
+                .andExpect(jsonPath("content[0].defaultMessage").exists())
+                .andExpect(jsonPath("content[0].code").exists())
+                .andExpect(jsonPath("_links.index").exists())
 
         ;
     }

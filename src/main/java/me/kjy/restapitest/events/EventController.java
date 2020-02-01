@@ -54,7 +54,7 @@ public class EventController {
 
         // 위의 과정과 같은 역할 ==> ModelMaper
         if(errors.hasErrors()) {
-            return ResponseEntity.badRequest().body(errors);
+            return badRequest(errors);
         }
         /**
          * errors라는 객체를 json으로 변환을 바로 할수가 없기 때문에 body(errors)는 에러남.
@@ -67,7 +67,7 @@ public class EventController {
         // eventDto 검증 실행
         eventValidator.validate(eventDto, errors);
         if(errors.hasErrors()) {
-            return ResponseEntity.badRequest().body(errors);
+            return badRequest(errors);
         }
 
         Event event = modelMapper.map(eventDto, Event.class);
